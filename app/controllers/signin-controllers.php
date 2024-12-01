@@ -8,9 +8,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_SPECIAL_CHARS);
     $password = $_POST["password"];
     try {
-        $sql = "SELECT * FROM employees WHERE email = ?";
+        $sql = "SELECT * FROM employees WHERE email = ? && password = ?";
         $stmt = $connection->prepare($sql);
-        $stmt->execute([ $email]);
+        $stmt->execute([ $email, $password]);
         
         $user = $stmt->fetch();
         $_SESSION["user"] = $user;

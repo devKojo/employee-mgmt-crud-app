@@ -5,6 +5,7 @@ include __DIR__ . '/../../models/getAllUsers.php';
 $login_page = 'location: login.php';
 
 $user = $_SESSION['user'];
+$firstName = $user['firstName'];
 $fullName = $user['firstName'] . ' ' . $user['lastName'];
 $email = $user['email'];
 $role = $user['role'];
@@ -13,6 +14,8 @@ if(isset($_POST['logout_btn'])){
     session_destroy();
     header($login_page);
 }
+
+
 
 ?>
 
@@ -23,7 +26,11 @@ if(isset($_POST['logout_btn'])){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Account Dashboard</title>
     <link rel="stylesheet" href="../../../public/assets/dashboard.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
+    <script src="../../../public/assets/js/index.js" defer></script>
+
+    <link rel="stylesheet" href="../../../public/assets/css/fontawesome.css">
+    <link rel="stylesheet" href="../../../public/assets/css/modal.css">
+    <link rel="stylesheet" href="../../../public/assets/css/dataTables.dataTables.css" />
 </head>
 <body>
     <div class="dashboard">
@@ -37,9 +44,14 @@ if(isset($_POST['logout_btn'])){
         <aside class="sidebar">
     <nav>
         <ul>
-            <li><a href="#" class="active">Overview</a></li>
-            <li><a href="#">Settings</a></li>
-            <li><a href="#">Messages</a></li>
+            <li><a href="#" class="active">Dashboard</a></li>
+            <li><a href="./createUser.php">
+                <?php 
+                if($role == 'admin' ){
+                   echo 'New User';
+                }
+                ?>
+            </a></li>
             <li><a href="#">
                         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="POST">
                             <button type="submit" id="logout" name="logout_btn" class="logout-btn">Logout</button></a>
@@ -49,10 +61,35 @@ if(isset($_POST['logout_btn'])){
     </nav>
 </aside>
         <main>
+
+
+
             <section class="welcome">
-                <h1>Welcome, <?php echo $fullName; ?></h1>
+                <h1>Welcome, <?php echo $firstName; ?></h1>
                 <p><strong><?php echo $email; ?></strong> | <?php echo $role; ?></p>
             </section>
+
+       <div class="statistics-cards">
+            <div class="card">
+            <i class="fas fa-users icon"></i>
+            <h3>No. of Users</h3>
+            <p><?php
+                if($role == 'admin'){
+                    echo count($_SESSION['getAllUsers']);
+                }
+            ?></p>
+            </div>
+            <div class="card">
+            <i class="fas fa-user-shield icon"></i>
+            <h3>No. of Admins</h3>
+            <p></p>
+            </div>
+            <div class="card">
+            <i class="fas fa-user-friends icon"></i>
+            <h3>Total Users</h3>
+            <p></p>
+            </div>
+        </div>
 
             <div class="table-container">
                 <table id="userTable" class="display">
@@ -80,8 +117,12 @@ if(isset($_POST['logout_btn'])){
                                     echo '<td>' . htmlspecialchars($user['department']) . '</td>';
                                     echo '<td>' . htmlspecialchars($user['role']) . '</td>';
                                     echo '<td>';
-                                    echo '<button class="edit-btn" onclick="editUser(' . htmlspecialchars($user['id']) . ')">Edit</button>';
-                                    echo '<button class="delete-btn" onclick="deleteUser(' . htmlspecialchars($user['id']) . ')">Delete</button>';
+                                    echo '<form action="../views/signup.php" method="GET">
+                                    <input type="hidden" name="record" value="' . htmlspecialchars($user["id"]) . '">
+                                    <button type="submit" class="openModal edit-btn" name="edit-btn">Edit</button>
+                                    <button type="submit" class="delete-btn" name="delete-btn">Delete</button>
+                                  </form>';
+                                    echo '';
                                     echo '</td>';
                                     echo '</tr>';
                                 }
@@ -94,8 +135,9 @@ if(isset($_POST['logout_btn'])){
             </div>
         </main>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+
+    <script src="../../../public/assets/js/jquery-3.6.0.min.js"></script>
+    <script src="../../../public/assets/js/dataTables.js"></script>
 
     
     <script>
